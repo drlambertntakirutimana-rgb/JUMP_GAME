@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jump Game</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #111827;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  text-align: center;
+}
+
+h1 {
+  color: white;
+  margin: 15px 0;
+}
+
+#game {
+  width: 100%;
+  max-width: 600px;
+  height: 70vh;
+  margin: auto;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(#38bdf8, #dbeafe);
+  border-bottom: 8px solid #22c55e;
+}
+
+#player {
+  width: 45px;
+  height: 45px;
+  background: #ef4444;
+  border-radius: 50%;
+  position: absolute;
+  left: 60px;
+  bottom: 0;
+}
+
+#obstacle {
+  width: 40px;
+  height: 55px;
+  background: #111827;
+  position: absolute;
+  right: -50px;
+  bottom: 0;
+}
+
+#score {
+  color: white;
+  font-size: 24px;
+  margin: 10px;
+}
+
+button {
+  padding: 15px 30px;
+  font-size: 20px;
+  border: none;
+  border-radius: 12px;
+  background: #22c55e;
+  color: white;
+  font-weight: bold;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏃 JUMP GAME</h1>
+
+<div id="score">Score: 0</div>
+
+<div id="game">
+  <div id="player"></div>
+  <div id="obstacle"></div>
+</div>
+
+<br>
+
+<button onclick="jump()">JUMP ⬆️</button>
+
+<script>
+const player = document.getElementById("player");
+const obstacle = document.getElementById("obstacle");
+const scoreText = document.getElementById("score");
+
+let jumping = false;
+let score = 0;
+let gameOver = false;
+
+function jump() {
+  if (jumping || gameOver) return;
+
+  jumping = true;
+
+  let height = 0;
+
+  const up = setInterval(() => {
+    height += 6;
+    player.style.bottom = height + "px";
+
+    if (height >= 140) {
+      clearInterval(up);
+
+      const down = setInterval(() => {
+        height -= 6;
+        player.style.bottom = height + "px";
+
+        if (height <= 0) {
+          clearInterval(down);
+          player.style.bottom = "0px";
+          jumping = false;
+        }
+      }, 20);
+    }
+  }, 20);
+}
+
+document.addEventListener("touchstart", jump);
+
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space" || e.code === "ArrowUp") {
+    jump();
+  }
+});
+
+function gameLoop() {
+  if (gameOver) return;
+
+  let obstacleRight = parseInt(
+    getComputedStyle(obstacle).right
+  );
+
+  obstacleRight += 5;
+
+  if (obstacleRight > window.innerWidth) {
+    obstacleRight = -50;
+    score++;
+    scoreText.textContent = "Score: " + score;
+  }
+
+  obstacle.style.right = obstacleRight + "px";
+
+  const playerBottom = parseInt(
+    getComputedStyle(player).bottom
+  );
+
+  const obstacleLeft = obstacle.offsetLeft;
+
+  if (
+    obstacleLeft < 105 &&
+    obstacleLeft > 30 &&
+    playerBottom < 50
+  ) {
+    gameOver = true;
+    alert("GAME OVER! Score: " + score);
+    location.reload();
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
